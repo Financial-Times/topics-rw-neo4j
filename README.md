@@ -52,6 +52,8 @@ Invalid json body input, or uuids that don't match between the path and the body
 Example:
 `curl -XPUT -H "X-Request-Id: 123" -H "Content-Type: application/json" localhost:8080/topics/bba39990-c78d-3629-ae83-808c333c6dbc --data '{"uuid":"bba39990-c78d-3629-ae83-808c333c6dbc","prefLabel":"Metals Markets", "alternativeIdentifiers":{"TME":["MTE3-U3ViamVjdHM="],"uuids": ["bba39990-c78d-3629-ae83-808c333c6dbc","6a2a0170-6afa-4bcc-b427-430268d2ac50"],"factsetIdentifier":"asdasd","leiCode":"baz","type":"Topic"}}'`
 
+There exists a `type` parameter too, but so far it is ignored at the write part - default types (Thing, Concept, Topic) will be written instead.
+
 ### GET
 The internal read should return what got written
 

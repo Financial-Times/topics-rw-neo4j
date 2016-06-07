@@ -17,4 +17,4 @@ RUN apk add --update bash \
   && apk del go git bzr \
   && rm -rf $GOPATH /var/cache/apk/*
 
-CMD [ "/app" ] 
+CMD exec /app

@@ -39,7 +39,7 @@ NB: the default batchSize is much higher than the throughput the instance data i
 ## Endpoints
 /topics/{uuid}
 ### PUT
-The only mandatory field is the uuid, and the uuid in the body must match the one used on the path.
+The only mandatory field is the uuid and prefLabel and alternativeIdentifiers.uuids. The uuid in the body must match the one used on the path.
 
 Every request results in an attempt to update that topic: unlike with GraphDB there is no check on whether the topic already exists and whether there are any changes between what's there and what's being written. We just do a MERGE which is Neo4j for create if not there, update if it is there.
 
@@ -50,7 +50,7 @@ We run queries in batches. If a batch fails, all failing requests will get a 500
 Invalid json body input, or uuids that don't match between the path and the body will result in a 400 bad request response.
 
 Example:
-`curl -XPUT -H "X-Request-Id: 123" -H "Content-Type: application/json" localhost:8080/topics/bba39990-c78d-3629-ae83-808c333c6dbc --data '{"uuid":"bba39990-c78d-3629-ae83-808c333c6dbc","canonicalName":"Metals Markets","tmeIdentifier":"MTE3-U3ViamVjdHM=","type":"Topic"}'`
+`curl -XPUT -H "X-Request-Id: 123" -H "Content-Type: application/json" localhost:8080/topics/bba39990-c78d-3629-ae83-808c333c6dbc --data '{"uuid":"bba39990-c78d-3629-ae83-808c333c6dbc","prefLabel":"Metals Markets", "alternativeIdentifiers":{"TME":["MTE3-U3ViamVjdHM="],"uuids": ["bba39990-c78d-3629-ae83-808c333c6dbc","6a2a0170-6afa-4bcc-b427-430268d2ac50"],"factsetIdentifier":"asdasd","leiCode":"baz","type":"Topic"}}'`
 
 ### GET
 The internal read should return what got written

@@ -134,7 +134,7 @@ func TestCount(t *testing.T) {
 
 	nr, err := topicsDriver.Count()
 	assert.Equal(1, nr, "Should be 1 topics in DB - count differs")
-	assert.NoError(err, "No error happened during count")
+	assert.NoError(err, "An unexpected error occurred during count")
 
 	newAlternativeIds := alternativeIdentifiers{TME: []string{newTmeID}, UUIDS: []string{newTopicUUID}}
 	topicTwoToCount := Topic{UUID: newTopicUUID, PrefLabel: specialCharPrefLabel, AlternativeIdentifiers: newAlternativeIds}
@@ -143,7 +143,7 @@ func TestCount(t *testing.T) {
 
 	nr, err = topicsDriver.Count()
 	assert.Equal(2, nr, "Should be 2 topics in DB - count differs")
-	assert.NoError(err, "No error happened during count")
+	assert.NoError(err, "An unexpected error occurred during count")
 
 	cleanUp(assert, topicUUID, topicsDriver)
 	cleanUp(assert, newTopicUUID, topicsDriver)

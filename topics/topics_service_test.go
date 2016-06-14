@@ -14,8 +14,6 @@ const (
 	newTopicUUID         = "123456"
 	tmeID                = "TME_ID"
 	newTmeID             = "NEW_TME_ID"
-	fsetID               = "fset_ID"
-	leiCodeID            = "leiCode"
 	prefLabel            = "Test"
 	specialCharPrefLabel = "Test 'special chars"
 )
@@ -68,7 +66,7 @@ func TestCreateCompleteTopicWithPropsAndIdentifiers(t *testing.T) {
 	assert := assert.New(t)
 	topicsDriver := getTopicsCypherDriver(t)
 
-	alternativeIdentifiers := alternativeIdentifiers{TME: []string{tmeID}, UUIDS: []string{topicUUID}, FactsetIdentifier: fsetID, LeiCode: leiCodeID}
+	alternativeIdentifiers := alternativeIdentifiers{TME: []string{tmeID}, UUIDS: []string{topicUUID}}
 	topicToWrite := Topic{UUID: topicUUID, PrefLabel: prefLabel, AlternativeIdentifiers: alternativeIdentifiers}
 
 	assert.NoError(topicsDriver.Write(topicToWrite), "Failed to write topic")
@@ -84,7 +82,7 @@ func TestUpdateWillRemovePropertiesAndIdentifiersNoLongerPresent(t *testing.T) {
 	assert := assert.New(t)
 	topicsDriver := getTopicsCypherDriver(t)
 
-	allAlternativeIdentifiers := alternativeIdentifiers{TME: []string{}, UUIDS: []string{topicUUID}, FactsetIdentifier: fsetID, LeiCode: leiCodeID}
+	allAlternativeIdentifiers := alternativeIdentifiers{TME: []string{}, UUIDS: []string{topicUUID}}
 	topicToWrite := Topic{UUID: topicUUID, PrefLabel: prefLabel, AlternativeIdentifiers: allAlternativeIdentifiers}
 
 	assert.NoError(topicsDriver.Write(topicToWrite), "Failed to write topic")

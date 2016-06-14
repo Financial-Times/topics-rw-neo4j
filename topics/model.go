@@ -15,8 +15,6 @@ type alternativeIdentifiers struct {
 }
 
 const (
-	factsetIdentifierLabel = "FactsetIdentifier"
-	leiIdentifierLabel     = "LegalEntityIdentifier"
 	tmeIdentifierLabel     = "TMEIdentifier"
 	uppIdentifierLabel     = "UPPIdentifier"
 )

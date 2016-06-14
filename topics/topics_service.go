@@ -24,7 +24,6 @@ func (s service) Initialise() error {
 		"Thing":             "uuid",
 		"Concept":           "uuid",
 		"Topic":             "uuid",
-		"FactsetIdentifier": "value",
 		"TMEIdentifier":     "value",
 		"UPPIdentifier":     "value"})
 }
@@ -35,10 +34,8 @@ func (s service) Read(uuid string) (interface{}, bool, error) {
 	query := &neoism.CypherQuery{
 		Statement: `MATCH (n:Topic {uuid:{uuid}})
 OPTIONAL MATCH (upp:UPPIdentifier)-[:IDENTIFIES]->(n)
-OPTIONAL MATCH (fs:FactsetIdentifier)-[:IDENTIFIES]->(n)
 OPTIONAL MATCH (tme:TMEIdentifier)-[:IDENTIFIES]->(n)
-OPTIONAL MATCH (lei:LegalEntityIdentifier)-[:IDENTIFIES]->(n)
-return distinct n.uuid as uuid, n.prefLabel as prefLabel, labels(n) as types, {uuids:collect(distinct upp.value), TME:collect(distinct tme.value), factsetIdentifier:fs.value, leiCode:lei.value} as alternativeIdentifiers`,
+return distinct n.uuid as uuid, n.prefLabel as prefLabel, labels(n) as types, {uuids:collect(distinct upp.value), TME:collect(distinct tme.value)} as alternativeIdentifiers`,
 		Parameters: map[string]interface{}{
 			"uuid": uuid,
 		},
@@ -91,16 +88,6 @@ func (s service) Write(thing interface{}) error {
 	queryBatch := []*neoism.CypherQuery{deletePreviousIdentifiersQuery, createTopicQuery}
 
 	//ADD all the IDENTIFIER nodes and IDENTIFIES relationships
-	if topic.AlternativeIdentifiers.FactsetIdentifier != "" {
-		factsetIdentifierQuery := createNewIdentifierQuery(topic.UUID, factsetIdentifierLabel, topic.AlternativeIdentifiers.FactsetIdentifier)
-		queryBatch = append(queryBatch, factsetIdentifierQuery)
-	}
-
-	if topic.AlternativeIdentifiers.LeiCode != "" {
-		leiCodeIdentifierQuery := createNewIdentifierQuery(topic.UUID, leiIdentifierLabel, topic.AlternativeIdentifiers.LeiCode)
-		queryBatch = append(queryBatch, leiCodeIdentifierQuery)
-	}
-
 	for _, alternativeUUID := range topic.AlternativeIdentifiers.TME {
 		alternativeIdentifierQuery := createNewIdentifierQuery(topic.UUID, tmeIdentifierLabel, alternativeUUID)
 		queryBatch = append(queryBatch, alternativeIdentifierQuery)

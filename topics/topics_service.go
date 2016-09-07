@@ -9,18 +9,17 @@ import (
 )
 
 type service struct {
-	cypherRunner neoutils.CypherRunner
-	indexManager neoutils.IndexManager
+	conn neoutils.NeoConnection
 }
 
 // NewCypherTopicsService provides functions for create, update, delete operations on topics in Neo4j,
 // plus other utility functions needed for a service
-func NewCypherTopicsService(cypherRunner neoutils.CypherRunner, indexManager neoutils.IndexManager) service {
-	return service{cypherRunner, indexManager}
+func NewCypherTopicsService(cypherRunner neoutils.NeoConnection) service {
+	return service{cypherRunner}
 }
 
 func (s service) Initialise() error {
-	return neoutils.EnsureConstraints(s.indexManager, map[string]string{
+	return s.conn.EnsureConstraints(map[string]string{
 		"Thing":             "uuid",
 		"Concept":           "uuid",
 		"Topic":             "uuid",
@@ -42,7 +41,7 @@ return distinct n.uuid as uuid, n.prefLabel as prefLabel, labels(n) as types, {u
 		Result: &results,
 	}
 
-	err := s.cypherRunner.CypherBatch([]*neoism.CypherQuery{query})
+	err := s.conn.CypherBatch([]*neoism.CypherQuery{query})
 
 	if err != nil {
 		return Topic{}, false, err
@@ -98,7 +97,7 @@ func (s service) Write(thing interface{}) error {
 		queryBatch = append(queryBatch, alternativeIdentifierQuery)
 	}
 
-	return s.cypherRunner.CypherBatch(queryBatch)
+	return s.conn.CypherBatch(queryBatch)
 
 }
 
@@ -146,7 +145,7 @@ func (s service) Delete(uuid string) (bool, error) {
 		},
 	}
 
-	err := s.cypherRunner.CypherBatch([]*neoism.CypherQuery{clearNode, removeNodeIfUnused})
+	err := s.conn.CypherBatch([]*neoism.CypherQuery{clearNode, removeNodeIfUnused})
 
 	s1, err := clearNode.Stats()
 	if err != nil {
@@ -168,7 +167,7 @@ func (s service) DecodeJSON(dec *json.Decoder) (interface{}, string, error) {
 }
 
 func (s service) Check() error {
-	return neoutils.Check(s.cypherRunner)
+	return neoutils.Check(s.conn)
 }
 
 func (s service) Count() (int, error) {
@@ -182,7 +181,7 @@ func (s service) Count() (int, error) {
 		Result:    &results,
 	}
 
-	err := s.cypherRunner.CypherBatch([]*neoism.CypherQuery{query})
+	err := s.conn.CypherBatch([]*neoism.CypherQuery{query})
 
 	if err != nil {
 		return 0, err

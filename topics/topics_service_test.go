@@ -3,9 +3,9 @@ package topics
 import (
 	"os"
 	"testing"
+	"sort"
 
 	"github.com/Financial-Times/neo-utils-go/neoutils"
-	"github.com/jmcvetta/neoism"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -148,12 +148,20 @@ func TestCount(t *testing.T) {
 }
 
 func readTopicForUUIDAndCheckFieldsMatch(assert *assert.Assertions, topicsDriver service, uuid string, expectedTopic Topic) {
+	sort.Strings(expectedTopic.Types)
+	sort.Strings(expectedTopic.AlternativeIdentifiers.TME)
+	sort.Strings(expectedTopic.AlternativeIdentifiers.UUIDS)
 
 	storedTopic, found, err := topicsDriver.Read(uuid)
 
 	assert.NoError(err, "Error finding topic for uuid %s", uuid)
 	assert.True(found, "Didn't find topic for uuid %s", uuid)
-	assert.Equal(expectedTopic, storedTopic, "topics should be the same")
+
+	actualTopic := storedTopic.(Topic)
+	sort.Strings(actualTopic.Types)
+	sort.Strings(actualTopic.AlternativeIdentifiers.TME)
+	sort.Strings(actualTopic.AlternativeIdentifiers.UUIDS)
+	assert.Equal(expectedTopic, actualTopic, "topics should be the same")
 }
 
 func getTopicsCypherDriver(t *testing.T) service {
@@ -163,9 +171,13 @@ func getTopicsCypherDriver(t *testing.T) service {
 		url = "http://localhost:7474/db/data"
 	}
 
-	db, err := neoism.Connect(url)
+	conf := neoutils.DefaultConnectionConfig()
+	conf.Transactional = false
+	db, err := neoutils.Connect(url, conf)
 	assert.NoError(err, "Failed to connect to Neo4j")
-	return NewCypherTopicsService(neoutils.StringerDb{db}, db)
+	sv := NewCypherTopicsService(db)
+	sv.Initialise()
+	return sv
 }
 
 func cleanUp(assert *assert.Assertions, uuid string, topicsDriver service) {
